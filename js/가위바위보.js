@@ -5,7 +5,7 @@ var dictionary = {
     보: '-284px',
 };
 
-console.log(Object.entries(dictionary));
+console.log('엔트리'+Object.entries(dictionary));
 function 컴퓨터의선택(이미지좌표){
     return Object.entries(dictionary).find(function(v){//반복하면서 값을 찾음. 이차원배열에선 find, findIndex씀. 
         return v[1]=== 이미지좌표;

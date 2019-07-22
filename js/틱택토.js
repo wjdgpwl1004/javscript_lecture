@@ -4,8 +4,47 @@ var 줄들 = [];
 var 칸들 = [];
 var 턴 = 'X';
 var 결과 = document.createElement('div');
+function 결과체크(몇줄, 몇칸){
+    //세칸 다 채워졌나?
+    var 다참 = false;
+    //가로 줄 검사
+    if(칸들[몇줄][0].textContent===턴 && 칸들[몇줄][1].textContent===턴 && 칸들[몇줄][2].textContent===턴){
+        다참 = true;
+    }
+    //세로줄 검사
+    if(칸들[0][몇칸].textContent===턴 && 칸들[1][몇칸].textContent===턴 && 칸들[2][몇칸].textContent===턴){
+        다참 = true;
+    }
+    //대각선검사
+    if(몇줄-몇칸===0 || Math.abs(몇줄 - 몇칸)===2){//대각선 검사 필요한 경우
+        if(칸들[0][0].textContent===턴 && 칸들[1][1].textContent===턴 && 칸들[2][2].textContent===턴){
+            다참 = true;
+        }else if(칸들[0][2].textContent===턴 && 칸들[1][1].textContent===턴 && 칸들[2][0].textContent===턴){
+            다참 = true;
+        }
+    }
+    return 다참;
+}
 
-var 비동기콜백 = function(이벤트){
+function 초기화(){
+    결과.textContent=턴 + '님이 승리!';
+    setTimeout(function(){
+        결과.textContent = '';
+        칸들.forEach(function(줄){
+            줄.forEach(function(칸){
+                칸.textContent='';
+            });
+        });
+        턴='X';
+    }, 1000);
+
+}
+
+var 비동기콜백 = function(이벤트){//칸을 클릭했을때
+    if(턴==='O'){//컴퓨터의 턴일 때 내가 클릭하지 않도록
+        return;
+    }
+
     console.log(이벤트.target);//칸
     console.log(이벤트.target.parentNode);//줄
 
@@ -20,42 +59,43 @@ var 비동기콜백 = function(이벤트){
     }else{
         console.log('빈칸.');
         칸들[몇줄][몇칸].textContent=턴;
+        var 다참 = 결과체크(몇줄, 몇칸);
 
-        //세칸 다 채워졌나?
-        var 다참 = false;
-        //가로 줄 검사
-        if(칸들[몇줄][0].textContent===턴 && 칸들[몇줄][1].textContent===턴 && 칸들[몇줄][2].textContent===턴){
-            다참 = true;
-        }
-        //세로줄 검사
-        if(칸들[0][몇칸].textContent===턴 && 칸들[1][몇칸].textContent===턴 && 칸들[2][몇칸].textContent===턴){
-            다참 = true;
-        }
-        //대각선검사
-        if(몇줄-몇칸===0 || Math.abs(몇줄 - 몇칸)===2){//대각선 검사 필요한 경우
-            if(칸들[0][0].textContent===턴 && 칸들[1][1].textContent===턴 && 칸들[2][2].textContent===턴){
-                다참 = true;
-            }else if(칸들[0][2].textContent===턴 && 칸들[1][1].textContent===턴 && 칸들[2][0].textContent===턴){
-                다참 = true;
-            }
-        }
-        
+
+
+
         //다 찼으면
         if(다참){
-            결과.textContent=턴 + '님이 승리!';
-            //초기화
-            턴='X';
-            칸들.forEach(function(줄){
-                줄.forEach(function(칸){
-                    칸.textContent='';
-                });
-            });
+           초기화();
         }else{//다 안찼으면
             if(턴==='X'){
                 턴='O';
             }else{
                 턴='X';
             }
+            setTimeout(function(){
+               console.log('컴퓨터의 턴');
+               //빈칸중하나를 고른다.
+                var 후보칸 = [];
+                칸들.forEach(function(줄){
+                   줄.forEach(function(칸){
+                       후보칸.push(칸);
+                   }) ;
+                });
+                후보칸 = 후보칸.filter(function(칸){return !칸.textContent});
+                var 선택칸 = 후보칸[Math.floor(Math.random()*후보칸.length)];
+                선택칸.textContent = 턴;
+                //컴퓨터가 승리했는지 체크
+                var 몇줄 = 줄들.indexOf(선택칸.parentNode);
+                var 몇칸 = 칸들[몇줄].indexOf(선택칸);
+                var 다참 = 결과체크(몇줄, 몇칸);
+                //다 찼으면
+                if(다참){
+                    초기화();
+                }
+                // 턴을 나에게 넘긴다.
+                턴 = 'X';
+            }, 1000);
         }
     }
     
