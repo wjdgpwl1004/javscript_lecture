@@ -26,8 +26,13 @@ function 결과체크(몇줄, 몇칸){
     return 다참;
 }
 
-function 초기화(){
-    결과.textContent=턴 + '님이 승리!';
+function 초기화(무승부){
+    if(무승부){
+        결과.textContent = '무승부';
+    }else{
+        결과.textContent=턴 + '님이 승리!';
+    }
+
     setTimeout(function(){
         결과.textContent = '';
         칸들.forEach(function(줄){
@@ -61,12 +66,22 @@ var 비동기콜백 = function(이벤트){//칸을 클릭했을때
         칸들[몇줄][몇칸].textContent=턴;
         var 다참 = 결과체크(몇줄, 몇칸);
 
+        //모든 칸이 다 찼는지 검사
+        var 후보칸 = [];
+        칸들.forEach(function(줄){
+            줄.forEach(function(칸){
+                후보칸.push(칸);
+            }) ;
+        });
+        후보칸 = 후보칸.filter(function(칸){return !칸.textContent});
 
-
-
+        console.log('다참 = ', 다참);
         //다 찼으면
         if(다참){
-           초기화();
+           초기화(false);//false는 안넣어도 됨
+        }else if(후보칸.length ===0){//칸을 더이상 선택할 수 없음
+            초기화(true);
+
         }else{//다 안찼으면
             if(턴==='X'){
                 턴='O';
@@ -76,13 +91,8 @@ var 비동기콜백 = function(이벤트){//칸을 클릭했을때
             setTimeout(function(){
                console.log('컴퓨터의 턴');
                //빈칸중하나를 고른다.
-                var 후보칸 = [];
-                칸들.forEach(function(줄){
-                   줄.forEach(function(칸){
-                       후보칸.push(칸);
-                   }) ;
-                });
-                후보칸 = 후보칸.filter(function(칸){return !칸.textContent});
+
+
                 var 선택칸 = 후보칸[Math.floor(Math.random()*후보칸.length)];
                 선택칸.textContent = 턴;
                 //컴퓨터가 승리했는지 체크
@@ -118,6 +128,7 @@ for(var i=1; i<=3; i+=1){
 console.log(줄들, 칸들);
 
 //정리
+//0. 다참-> 승리여부
 // 1. input 의 값이 value, 태그 안 글자는 textContent
 // 2. 배열이나 객체는 데이터를 표현하는데 많이 쓰인다. 표를 데이터로 시뮬레이트 해야 한다. 
 // 3. 이벤트 발생 시, 선택된 타겟 가져오는 것, e.target / 부모 노드 가져오는것 e.target.parentNode / 자식 가져오는 것 e.target.children
