@@ -69,3 +69,47 @@ function checkCompare () {
         })(firstCard, secondCard);
     }
 }
+
+//원시값은 복사
+//객체, 배열, 함수는 참조관계
+
+//객체를 복사하는 방법 1
+// var obj = {a: 1, b: 2}
+// var obj2 = {};
+//
+// obj2.a = obj.a;
+// obj2.b = obj.b; //원시값을 하나씩 대입하여 복사
+
+//객체를 복사하는 방법 2
+// var obj = {a: 1, b: 2, c: 3}
+// Object.keys(obj) //["a","b","c"];
+//
+// var obj2 ={};
+// Object.keys(obj).forEach(function (key) { 1단계만 복사, 나머지는 참조
+//    obj2[key] = obj[key];
+// });
+var obj = {a: 1, b: {c: 1} };//이런경우 위처럼 반복문을 돌려도 a의 값은 원시값이라 복사가되지만, b의 값은 객체라서 참조가 된다.
+//앝은복사 ->참조, 깊은복사->복사
+
+function copyObj(obj) { //재귀로 복사..
+    var copy = {};
+    if (Array.isArray(obj)) {
+        copy = obj.slice().map((v) => {
+            return copyObj(v);
+        });
+    } else if (typeof obj === 'object' && obj !== null) {
+        for (var attr in obj) {
+            if (obj.hasOwnProperty(attr)) {
+                copy[attr] = copyObj(obj[attr]);
+            }
+        }
+    } else {
+        copy = obj;
+    }
+    return copy;
+}
+
+// obj2 = JSON.parse(JSON.stringify(obj));
+
+//베열은 slice()이용 하지만 1단계만 복사, 나머지는 참조
+
